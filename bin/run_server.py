@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright (c) 2016 The Johns Hopkins University/Applied Physics Laboratory
 # All Rights Reserved.

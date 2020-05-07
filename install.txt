@@ -1,0 +1,85 @@
+##
+## Steps to install PyKmip on a server and configure it.
+##
+## - After the 'clone" everything needs to run as root.
+##
+
+# Install the necessary packages.
+yum install python36-cryptography
+yum install python-requests
+
+# Clone the Versity PyKMIP repository, change into it, and install it into the system.
+git clone https://github.com/versity/PyKMIP.git
+cd PyKMIP
+pip3 install .
+
+# Install the server executable.
+cp bin/run_server.py /usr/local/bin/pykmip_server
+
+# Install the systemd service.
+cp pykmip.service /etc/systemd/system
+
+# Create the configuration directory.
+mkdir /etc/pykmip
+chmod 755 /etc/pymkip
+
+# Copy the server configuration into the configuration directory.
+cp conf/server.conf /etc/pykmip
+chmod 644 /etc/pykmip/server.conf
+
+# Copy the clients configuration into the configuration directory.
+#  - Probably should not be world readable but it is for test clients
+cp conf/client.conf /etc/pykmip
+chmod 644 /etc/pykmip/client.conf
+
+# Creae the policies directory and copy the server policies into it.
+mkdir /etc/pykmip/policies
+chmod 755 /etc/pymkip/policies
+cp examples/policy.json /etc/pykmip/policies
+chmod 644 /etc/pykmip/policies/policy.json
+
+# Create the directory for the database.
+mkdir /var/log/pykmip
+
+# Create the directory for the log files.
+mkdir /var/lib/pykmip
+chmod 700 /var/lib/pykmip
+
+# Create the certificates.
+#  - The client certificates should not be in the '/etc/pykmip/certs'
+#    directory; they are the clients and should be stored somewhere
+#    only privately accessable to them.  But, it works in a test
+#    environment.  The ownership and permissions are set so the client
+#    CLI commands can read them.
+
+mkdir /etc/pykmip/certs
+chmod 755 /etc/pykmip/certs
+./bin/create_certificate.py --certs=/etc/pykmip/certs --organization='Versity, Inc.' --root --server
+chown root:root /etc/pykmip/certs/*
+
+chmod 644 /etc/pykmip/certs/root_certificate.pem
+chmod 600 /etc/pykmip/certs/root_key.pem
+
+chmod 600 /etc/pykmip/certs/server_certificate.pem
+chmod 600 /etc/pykmip/certs/server_key.pem
+cp /etc/pykmip/certs/server_certificate.pem /etc/opt/vsm/keystore
+
+./bin/create_certificate.py --certs=/etc/pykmip/certs --organization='Versity, Inc.' --name='Versity User1'
+cp /etc/pykmip/certs/client_certificate_Versity_User1.pem /etc/opt/vsm/keystore
+chmod 644 /etc/pykmip/certs/client_certificate_Versity_User1.pem
+chmod 600 /etc/opt/vsm/keystore/client_certificate_Versity_User1.pem
+cp /etc/pykmip/certs/client_key_Versity_User1.pem /etc/opt/vsm/keystore
+chmod 644 /etc/pykmip/certs/client_key_Versity_User1.pem
+chmod 600 /etc/opt/vsm/keystore/client_key_Versity_User1.pem
+
+./bin/create_certificate.py --certs=/etc/pykmip/certs --organization='Versity, Inc.' --name='Versity User2'
+cp /etc/pykmip/certs/client_certificate_Versity_User2.pem /etc/opt/vsm/keystore
+chmod 644 /etc/pykmip/certs/client_certificate_Versity_User2.pem
+chmod 600 /etc/opt/vsm/keystore/client_certificate_Versity_User2.pem
+cp /etc/pykmip/certs/client_key_Versity_User2.pem /etc/opt/vsm/keystore
+chmod 644 /etc/pykmip/certs/client_key_Versity_User2.pem
+chmod 600 /etc/opt/vsm/keystore/client_key_Versity_User2.pem
+
+# Configure systemd and start the server.
+systemctl daemon-reload
+systemctl start pykmipd

@@ -1,0 +1,13 @@
+[Unit]
+Description=Development Test PyKMIP server
+Documentation=man:PyKmip(1)
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/pykmip-server
+#ExecStart=/usr/local/bin/pykmip-server -c /etc/pykmip/server.conf
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

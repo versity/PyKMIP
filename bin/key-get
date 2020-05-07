@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import ssl
+from kmip.pie.client import ProxyKmipClient
+from kmip.pie import client
+from kmip import enums
+
+key_id = '12'
+
+client = ProxyKmipClient(config_file='/etc/pykmip/client.conf',
+                         config='client_user1')
+
+with client:
+    #client.open()
+    key = client.get(key_id)
+    print('key: %s' % key)

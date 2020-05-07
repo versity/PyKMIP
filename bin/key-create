@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+from kmip.pie.client import ProxyKmipClient
+from kmip.pie import objects
+from kmip import enums
+
+client = ProxyKmipClient(config_file='/etc/pykmip/client.conf',
+                         config='client_user1')
+
+with client:
+    key_id = client.create(
+        enums.CryptographicAlgorithm.AES,
+        256,
+        operation_policy_name='default',
+        name='Test_256_AES_Symmetric_Key',
+        cryptographic_usage_mask=[
+            enums.CryptographicUsageMask.ENCRYPT,
+            enums.CryptographicUsageMask.DECRYPT
+        ]
+    ) 
+
+    print('key[%s] created' % key_id)
+
+    key = client.get(key_id)
+    print('key: %s' % key)
