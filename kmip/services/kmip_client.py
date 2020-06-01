@@ -1724,9 +1724,12 @@ class KMIPProxy(object):
         stream = BytearrayStream()
         message.write(stream, self.kmip_version)
         self.protocol.write(stream.buffer)
+        self.logger.debug("KMIPProxy _send_message() buffer: {0}".format(stream))
 
     def _receive_message(self):
-        return self.protocol.read()
+        message = self.protocol.read()
+        self.logger.debug("KMIPProxy _receive_message() buffer: {0}".format(message))
+        return message
 
     def _send_and_receive_message(self, request):
         self._send_message(request)

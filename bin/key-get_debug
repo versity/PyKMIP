@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+import logging
+import logging.config
+import ssl
+from kmip.pie.client import ProxyKmipClient
+from kmip.pie import client
+from kmip import enums
+
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    filename='/tmp/key-get.log',
+                    filemode='w')
+
+# define a Handler which writes INFO messages or higher to the sys.stderr
+tty = logging.StreamHandler()
+tty.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+tty.setFormatter(formatter)
+logging.getLogger('').addHandler(tty)
+
+key_id = '12'
+
+client = ProxyKmipClient(config_file='/etc/pykmip/client.conf',
+                         config='client_user1')
+
+with client:
+    #client.open()
+    key = client.get(key_id)
+    print('key: %s' % key)
